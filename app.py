@@ -5,6 +5,7 @@ from ultralytics import YOLO
 import logging
 import time
 from PIL import Image
+from pathlib import Path
 
 from gradcam.eigencam import EigenCAM
 from gradcam.utils import show_cam_on_image
@@ -20,7 +21,18 @@ logging.basicConfig(
 # --------------------------------------------------
 # Load YOLO model
 # --------------------------------------------------
-model = YOLO("models/yolo11bb_12_neck_v2best.pt")
+MODEL_PATH = Path(__file__).parent / "models" / "yolo11bb_12_neck_v2best.pt"
+def get_model():
+    try:
+        model = YOLO(MODEL_PATH)
+        logging.info("Model loaded successfully.")
+        return model
+    except Exception as e:
+        logging.error(f"Error loading model: {str(e)}")
+        raise
+
+
+model = get_model()
 
 # --------------------------------------------------
 # Target layers for EigenCAM
@@ -75,7 +87,7 @@ def detectAnomaly(image):
 # --------------------------------------------------
 # Gradio UI
 # --------------------------------------------------
-with gr.Blocks(title="YOLO Object Detection System") as demo:
+with gr.Blocks(title="YOLO Object Detection System") as solarApp:
 
     gr.Markdown(
         """
@@ -168,4 +180,4 @@ with gr.Blocks(title="YOLO Object Detection System") as demo:
 # --------------------------------------------------
 # Launch
 # --------------------------------------------------
-demo.launch()
+solarApp.launch()
